@@ -1,11 +1,10 @@
 import Link from "next/link";
-import { PropsWithChildren, useState } from "react";
-import PyodideProvider, { usePyodide } from "./pyodide-provider";
-import PyodideManager from "./pyodide-provider";
+import { PropsWithChildren } from "react";
+import { usePyodide } from "./pyodide-provider";
 import PythonEditor from "./python-editor";
 
 export default function Layout({ children }: PropsWithChildren<{}>) {
-  const { pyodide, loading } = usePyodide()
+  const { pyodide, loading, plotElementId } = usePyodide()
 
   return (
     <>
@@ -15,8 +14,8 @@ export default function Layout({ children }: PropsWithChildren<{}>) {
 
           {/* editors */}
           <div className="flex flex-row gap-8">
-            <PythonEditor pyodide={pyodide} pythonLoading={loading} />
-            <PythonEditor pyodide={pyodide} pythonLoading={loading} />
+            <PythonEditor pyodide={pyodide} pythonLoading={loading} outputType="rendered" />
+            <PythonEditor pyodide={pyodide} pythonLoading={loading} outputType="matplotlib" plotElementId={plotElementId} />
           </div>
 
           {/* navbar */}

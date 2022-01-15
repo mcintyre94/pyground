@@ -7,23 +7,29 @@ import type monaco from 'monaco-editor';
 type Props = {
   pythonLoading: boolean
   pyodide: Pyodide | undefined
+  outputType: "rendered" | "matplotlib"
+  plotElementId?: string
 }
 
-export default function PythonEditor({ pythonLoading, pyodide }: Props) {
+export default function PythonEditor({ pythonLoading, pyodide, outputType, plotElementId }: Props) {
   const [codeRunning, setCodeRunning] = useState(false)
-  const [output, setOutput] = useState(undefined)
+  const [error, setError] = useState<string | undefined>(undefined)
+  const [output, setOutput] = useState<string | undefined>(undefined)
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | undefined>(undefined)
 
   const runCode = async () => {
+    setError(undefined)
     setCodeRunning(true)
     try {
       const pythonClient = createPythonClient(pyodide)
       if (editorRef.current !== undefined) {
         const code = editorRef.current.getValue()
         const output = await pythonClient.run({ code })
+        setError(undefined)
         setOutput(output)
-        console.log('output', output)
       }
+    } catch (error) {
+      setError(String(error))
     } finally {
       setCodeRunning(false)
     }
@@ -32,6 +38,16 @@ export default function PythonEditor({ pythonLoading, pyodide }: Props) {
 
   const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor, _monaco: Monaco) => {
     editorRef.current = editor;
+  }
+
+  const renderOutput = () => {
+    if (outputType === "rendered" && output !== undefined) {
+      return <div className="prose prose-table:table-auto  prose-th:text-center whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: output }} />
+    } else if (outputType === "matplotlib" && plotElementId !== undefined) {
+      return <div className="prose" id={plotElementId} />
+    } else {
+      return null
+    }
   }
 
   return (
@@ -59,7 +75,10 @@ export default function PythonEditor({ pythonLoading, pyodide }: Props) {
           : "Run Code →"}
       </button>
 
-      <div className="border border-blue-600" />
+      {error ? <div className="text-sm text-red-400 border-red-600">{error}</div> : null}
+
+      {renderOutput()}
+
     </div>
   );
 
