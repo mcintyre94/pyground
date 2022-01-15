@@ -25,6 +25,8 @@ export default function PythonEditor({ pythonLoading, pyodide, outputType, plotE
       if (editorRef.current !== undefined) {
         const code = editorRef.current.getValue()
         const output = await pythonClient.run({ code })
+        console.log('running code', code)
+
         setError(undefined)
         setOutput(output)
       }

@@ -33,7 +33,7 @@ export default function PyodideProvider({ children }: PropsWithChildren<{}>) {
 
     const loadAndSetPyodide = async () => {
       const loadedPyodide = await window.loadPyodide({
-        indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.19.0/full/',
+        indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.18.1/full/',
       });
       await preloadMatplotlib(loadedPyodide);
       setPyodide(loadedPyodide);
@@ -72,7 +72,7 @@ export default function PyodideProvider({ children }: PropsWithChildren<{}>) {
   return (
     <>
       <Script
-        src="https://cdn.jsdelivr.net/pyodide/v0.19.0/full/pyodide.js"
+        src="https://cdn.jsdelivr.net/pyodide/v0.18.1/full/pyodide.js"
         strategy="beforeInteractive"
       />
       <Script src="https://kit.fontawesome.com/137d63e13e.js" />
