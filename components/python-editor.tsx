@@ -44,9 +44,9 @@ export default function PythonEditor({ pythonLoading, pyodide, outputType, plotE
 
   const renderOutput = () => {
     if (outputType === "rendered" && output !== undefined) {
-      return <div className="prose prose-table:table-auto  prose-th:text-center whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: output }} />
+      return <div className="prose prose-invert prose-table:table-auto  prose-th:text-center whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: output }} />
     } else if (outputType === "matplotlib" && plotElementId !== undefined) {
-      return <div className="prose" id={plotElementId} />
+      return <div className="prose prose-invert" id={plotElementId} />
     } else {
       return null
     }
