@@ -4,13 +4,13 @@ export const preloadMatplotlibCode = (plotElementId: string) => `
 import matplotlib.pyplot as plt
 from js import document
 
-f = plt.figure()
+fig = plt.figure()
 
 def get_render_element(self):
     return document.getElementById('${plotElementId}')
 
-f.canvas.create_root_element = get_render_element.__get__(
-    get_render_element, f.canvas.__class__
+fig.canvas.create_root_element = get_render_element.__get__(
+    get_render_element, fig.canvas.__class__
 )`;
 
 export type DateConversionFormat = "timestamp_seconds" | "isoformat" | string
