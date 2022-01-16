@@ -36,7 +36,10 @@ export default function CsvSelect({ onParsedCsv }: Props) {
         setParsing(false)
         console.error(error)
         setError(`${error.name}: ${error.message}`)
-      }
+      },
+      skipEmptyLines: true,
+      dynamicTyping: true,
+      encoding: "utf-8",
     })
   }
 

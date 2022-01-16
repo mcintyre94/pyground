@@ -1,6 +1,7 @@
 import { useState, useEffect, createContext, useContext, PropsWithChildren } from "react";
 import Script from "next/script";
 import { createPythonClient } from "@run-wasm/python"
+import { preloadMatplotlibCode } from "../lib/pythonFragments";
 
 declare global {
   // <- [reference](https://stackoverflow.com/a/56458070/11542903)
@@ -43,24 +44,10 @@ export default function PyodideProvider({ children }: PropsWithChildren<{}>) {
   }, [pyodide])
 
   const plotElementId = 'data-playground__plot'
-  // Python code that is preloaded before the user's code is run
-  // <- [reference](https://stackoverflow.com/a/59571016/1375972)
-  const preloadMatplotlibCode = `
-  import matplotlib.pyplot as plt
-  from js import document
-
-  f = plt.figure()
-
-  def get_render_element(self):
-      return document.getElementById('${plotElementId}')
-
-  f.canvas.create_root_element = get_render_element.__get__(
-      get_render_element, f.canvas.__class__
-  )`;
 
   async function preloadMatplotlib(pyodide: Pyodide) {
     const pythonClient = createPythonClient(pyodide)
-    await pythonClient.run({ code: preloadMatplotlibCode })
+    await pythonClient.run({ code: preloadMatplotlibCode(plotElementId) })
   }
 
   const value: Value = {
