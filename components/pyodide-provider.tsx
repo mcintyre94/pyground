@@ -14,12 +14,8 @@ export interface Pyodide {
   runPython: (code: string) => unknown
 }
 
-type RunPythonOutput =
-  { status: 'success', output: string } |
-  { status: 'error', error: string }
-
 type Value = {
-  runPython: (code: string) => Promise<RunPythonOutput>,
+  runPython: (code: string) => Promise<string>,
   pyodideLoading: boolean,
   plotElementId: string
 }
@@ -47,14 +43,10 @@ export default function PyodideProvider({ children }: PropsWithChildren<{}>) {
     loadAndSetPyodide();
   }, [pyodide])
 
-  const runPython = async (code: string): Promise<RunPythonOutput> => {
-    try {
-      const pythonClient = createPythonClient(pyodide)
-      const output = await pythonClient.run({ code })
-      return { status: 'success', output }
-    } catch (error) {
-      return { status: 'error', error: String(error) }
-    }
+  const runPython = async (code: string): Promise<string> => {
+    const pythonClient = createPythonClient(pyodide)
+    const output = await pythonClient.run({ code })
+    return output
   }
 
   const plotElementId = 'data-playground__plot'

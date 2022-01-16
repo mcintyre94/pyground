@@ -1,4 +1,5 @@
 import { ChangeEvent, FormEventHandler, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import CsvSelect from "../components/csv-select";
 import { usePyodide } from "../components/pyodide-provider";
 import { DateConversion, DateConversionFormat, preprocessData } from "../lib/pythonFragments";
@@ -100,8 +101,18 @@ export default function Home() {
     }))
 
     const dataCode = preprocessData(parsedData, dateConversions)
-    console.log(dataCode)
-    await runPython(dataCode)
+    console.log({ dataCode })
+
+    const promise = runPython(dataCode)
+    toast.promise(promise, {
+      loading: 'Setting the data...',
+      success: 'Data variable set',
+      error: (err) => `Failed to set data: ${err}`,
+    }, {
+      style: {
+        minWidth: "10em",
+      }
+    })
   }
 
   return (

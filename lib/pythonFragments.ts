@@ -31,11 +31,14 @@ const pythonDateConvert = (dateConversion: DateConversion) => {
   }
 }
 
+const processDateConversions = (dateConversions: DateConversion[]) => `
+for d in data:
+${dateConversions.map(dc => `    ${pythonDateConvert(dc)}`).join('\n')}
+`
+
 export const preprocessData = (data: Object[], dateConversions: DateConversion[]) => `
 from datetime import datetime
 import json
 
 data = json.loads('${(JSON.stringify(data).replaceAll("'", "\\'"))}')
-for d in data:
-${dateConversions.map(dc => `    ${pythonDateConvert(dc)}`).join('\n')}
-`
+` + (dateConversions.length > 0 ? processDateConversions(dateConversions) : '')

@@ -17,19 +17,19 @@ export default function PythonEditor({ outputType, plotElementId }: Props) {
 
   const runCode = async () => {
     setError(undefined)
-    setCodeRunning(true)
 
     if (editorRef.current !== undefined) {
       const code = editorRef.current.getValue()
-      const runPythonResult = await runPython(code)
-      if (runPythonResult.status === 'error') {
-        setError(runPythonResult.error)
-      } else {
-        setOutput(runPythonResult.output)
+      setCodeRunning(true)
+      try {
+        const output = await runPython(code)
+        setOutput(output)
+      } catch (error) {
+        setError(String(error))
+      } finally {
+        setCodeRunning(false)
       }
     }
-
-    setCodeRunning(false)
   }
 
   const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor, _monaco: Monaco) => {
