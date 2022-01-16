@@ -40,7 +40,7 @@ export default function PythonEditor({ outputType, plotElementId }: Props) {
     if (outputType === "rendered" && output !== undefined) {
       return <div className="prose prose-invert prose-table:table-auto prose-th:text-center whitespace-pre-wrap overflow-x-auto" dangerouslySetInnerHTML={{ __html: output }} />
     } else if (outputType === "matplotlib" && plotElementId !== undefined) {
-      return <div className="prose prose-invert" id={plotElementId} />
+      return <div className="invert" id={plotElementId} />
     } else {
       return null
     }

@@ -22,7 +22,7 @@ export type DateConversion = {
 
 const pythonDateConvert = (dateConversion: DateConversion) => {
   if (dateConversion.format === "timestamp_seconds") {
-    return `d['${dateConversion.field}'] = datetime.fromtimestamp(int(d['${dateConversion.field}'].strip().replace(',', '')))`
+    return `d['${dateConversion.field}'] = datetime.fromtimestamp(int(d['${dateConversion.field}']))`
   } else if (dateConversion.format === "isoformat") {
     return `d['${dateConversion.field}'] = datetime.fromisoformat(d['${dateConversion.field}'])`
   } else {
@@ -40,5 +40,10 @@ export const preprocessData = (data: Object[], dateConversions: DateConversion[]
 from datetime import datetime
 import json
 
-data = json.loads('${(JSON.stringify(data).replaceAll("'", "\\'"))}')
+data = json.loads('${JSON.stringify(data)
+    .replaceAll("\\n", " ")
+    .replaceAll("\\t", " ")
+    .replaceAll("\\", "/")
+    .replaceAll("'", "\\'")
+  }')
 ` + (dateConversions.length > 0 ? processDateConversions(dateConversions) : '')

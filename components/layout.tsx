@@ -18,12 +18,12 @@ export default function Layout({ children }: PropsWithChildren<{}>) {
           </div>
 
           {/* navbar */}
-          <nav>
+          {/* <nav>
             <ul>
               <li><Link href="/">Index</Link></li>
               <li><Link href="/second">Second</Link></li>
             </ul>
-          </nav>
+          </nav> */}
 
           {/* page contents */}
           {children}
