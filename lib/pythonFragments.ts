@@ -27,7 +27,7 @@ const pythonDateConvert = (dateConversion: DateConversion) => {
     return `d['${dateConversion.field}'] = datetime.fromisoformat(d['${dateConversion.field}'])`
   } else {
     // assume format is a valid input to strptime
-    return `d['${dateConversion.field}'] = datetime.strptime(d['${dateConversion.field}'], ${dateConversion.format})`
+    return `d['${dateConversion.field}'] = datetime.strptime(d['${dateConversion.field}'], '${dateConversion.format}')`
   }
 }
 
@@ -35,7 +35,7 @@ export const preprocessData = (data: Object[], dateConversions: DateConversion[]
 from datetime import datetime
 import json
 
-data = json.loads('${JSON.stringify(data)}')
+data = json.loads('${(JSON.stringify(data).replaceAll("'", "\\'"))}')
 for d in data:
 ${dateConversions.map(dc => `    ${pythonDateConvert(dc)}`).join('\n')}
 `

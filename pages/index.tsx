@@ -19,7 +19,7 @@ const shorten = (s: string, max: number) => {
 
 function FormRow({ field, firstValue, recordUpdate }: FormRowProps) {
   const [formatType, setFormatType] = useState<string>("none")
-  const [customFormat, setCustomFormat] = useState<string | undefined>(undefined)
+  const [customFormat, setCustomFormat] = useState<string>("")
 
   const onChangeFormatType = (e: ChangeEvent<HTMLSelectElement>) => {
     const newFormatType = e.target.value
@@ -65,7 +65,7 @@ export default function Home() {
   const [parsedData, setParsedData] = useState<Object[]>([])
   const [fields, setFields] = useState<FieldAndValue[]>([])
   const [dateConversionFormats, setDateConversionFormats] = useState<{ [field: string]: DateConversionFormat }>({})
-  const { pyodide } = usePyodide()
+  const { runPython } = usePyodide()
 
   useEffect(() => {
     if (parsedData.length > 0) {
@@ -92,7 +92,7 @@ export default function Home() {
     }
   }
 
-  const setData = (e: React.FormEvent<HTMLFormElement>) => {
+  const setData = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const dateConversions: DateConversion[] = Object.entries(dateConversionFormats).map(([field, format]) => ({
       field,
@@ -101,6 +101,7 @@ export default function Home() {
 
     const dataCode = preprocessData(parsedData, dateConversions)
     console.log(dataCode)
+    await runPython(dataCode)
   }
 
   return (
@@ -109,19 +110,25 @@ export default function Home() {
 
       <CsvSelect onParsedCsv={setParsedData} />
 
-      <form className="flex flex-col gap-4" onSubmit={setData}>
-        <table className="table-auto">
-          <tbody className="p-2">
-            {fields.map(({ field, value }) => <FormRow key={field} field={field} firstValue={value} recordUpdate={recordDateConversion} />)}
-          </tbody>
-        </table>
+      {fields.length > 0 ? (
+        <>
+          <h3 className="prose prose-invert prose-lg m-2">Optional: configure date fields</h3>
 
-        <button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-fit ml-8"
-        >Set Data</button>
+          <form className="flex flex-col gap-4" onSubmit={setData}>
+            <table className="table-auto">
+              <tbody className="p-2">
+                {fields.map(({ field, value }) => <FormRow key={field} field={field} firstValue={value} recordUpdate={recordDateConversion} />)}
+              </tbody>
+            </table>
 
-      </form>
+            <button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-fit ml-8"
+            >Set Data</button>
+
+          </form>
+        </>
+      ) : null}
 
     </div>
   )

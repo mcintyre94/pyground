@@ -1,17 +1,15 @@
 import Editor, { Monaco } from "@monaco-editor/react";
 import { useRef, useState } from "react";
-import { Pyodide } from "./pyodide-provider";
-import { createPythonClient } from "@run-wasm/python"
+import { usePyodide } from "./pyodide-provider";
 import type monaco from 'monaco-editor';
 
 type Props = {
-  pythonLoading: boolean
-  pyodide: Pyodide | undefined
   outputType: "rendered" | "matplotlib"
   plotElementId?: string
 }
 
-export default function PythonEditor({ pythonLoading, pyodide, outputType, plotElementId }: Props) {
+export default function PythonEditor({ outputType, plotElementId }: Props) {
+  const { runPython, pyodideLoading } = usePyodide()
   const [codeRunning, setCodeRunning] = useState(false)
   const [error, setError] = useState<string | undefined>(undefined)
   const [output, setOutput] = useState<string | undefined>(undefined)
@@ -20,22 +18,18 @@ export default function PythonEditor({ pythonLoading, pyodide, outputType, plotE
   const runCode = async () => {
     setError(undefined)
     setCodeRunning(true)
-    try {
-      const pythonClient = createPythonClient(pyodide)
-      if (editorRef.current !== undefined) {
-        const code = editorRef.current.getValue()
-        const output = await pythonClient.run({ code })
-        console.log('running code', code)
 
-        setError(undefined)
-        setOutput(output)
+    if (editorRef.current !== undefined) {
+      const code = editorRef.current.getValue()
+      const runPythonResult = await runPython(code)
+      if (runPythonResult.status === 'error') {
+        setError(runPythonResult.error)
+      } else {
+        setOutput(runPythonResult.output)
       }
-    } catch (error) {
-      setError(String(error))
-    } finally {
-      setCodeRunning(false)
     }
 
+    setCodeRunning(false)
   }
 
   const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor, _monaco: Monaco) => {
@@ -70,9 +64,9 @@ export default function PythonEditor({ pythonLoading, pyodide, outputType, plotE
       <button
         className="items-center px-4 py-2 text-sm font-medium text-gray-100 transition rounded-md bg-black hover:scale-105 disabled:hover:scale-100 disabled:opacity-50 w-fit"
         onClick={runCode}
-        disabled={codeRunning || pythonLoading}
+        disabled={codeRunning || pyodideLoading}
       >
-        {codeRunning || pythonLoading
+        {codeRunning || pyodideLoading
           ? "Loading..."
           : "Run Code →"}
       </button>

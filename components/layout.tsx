@@ -5,7 +5,7 @@ import { usePyodide } from "./pyodide-provider";
 import PythonEditor from "./python-editor";
 
 export default function Layout({ children }: PropsWithChildren<{}>) {
-  const { pyodide, loading, plotElementId } = usePyodide()
+  const { plotElementId } = usePyodide()
 
   return (
     <>
@@ -13,8 +13,8 @@ export default function Layout({ children }: PropsWithChildren<{}>) {
         <main className="flex flex-col gap-8 min-h-screen">
           {/* editors */}
           <div className="flex flex-row gap-8">
-            <PythonEditor pyodide={pyodide} pythonLoading={loading} outputType="rendered" />
-            <PythonEditor pyodide={pyodide} pythonLoading={loading} outputType="matplotlib" plotElementId={plotElementId} />
+            <PythonEditor outputType="rendered" />
+            <PythonEditor outputType="matplotlib" plotElementId={plotElementId} />
           </div>
 
           {/* navbar */}
