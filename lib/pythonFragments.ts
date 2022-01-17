@@ -47,3 +47,18 @@ data = json.loads('${JSON.stringify(data)
     .replaceAll("'", "\\'")
   }')
 ` + (dateConversions.length > 0 ? processDateConversions(dateConversions) : '')
+
+export const pandasEditorDefault = `import pandas as pd 
+
+df = pd.DataFrame(data)
+df.describe().to_html()`;
+
+export const matplotlibEditorDefault = `# preloaded:
+# import matplotlib.plt as pyplot
+# fig = plt.figure()
+
+x = [1,2,3]
+y = [4,5,6]
+plt.clf() # clear existing plot
+plt.plot(x, y)
+plt.show()`;

@@ -6,9 +6,10 @@ import type monaco from 'monaco-editor';
 type Props = {
   outputType: "rendered" | "matplotlib"
   plotElementId?: string
+  startCode: string
 }
 
-export default function PythonEditor({ outputType, plotElementId }: Props) {
+export default function PythonEditor({ outputType, plotElementId, startCode }: Props) {
   const { runPython, pyodideLoading } = usePyodide()
   const [codeRunning, setCodeRunning] = useState(false)
   const [error, setError] = useState<string | undefined>(undefined)
@@ -51,7 +52,7 @@ export default function PythonEditor({ outputType, plotElementId }: Props) {
       <Editor
         height="50vh"
         defaultLanguage="python"
-        defaultValue="# some comment"
+        defaultValue={startCode}
         theme="vs-dark"
         onMount={handleEditorDidMount}
         options={{
