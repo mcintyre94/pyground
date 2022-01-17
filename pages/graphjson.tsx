@@ -1,15 +1,36 @@
-import { useState } from "react"
+import React, { useState } from "react"
 import { usePyodide } from "../components/pyodide-provider"
 import { DateConversion, preprocessData } from "../lib/pythonFragments"
 import toast from "react-hot-toast"
+import axios from "axios"
+import Loader from "../components/loader"
+
+type GraphJSONCollection = {
+  name: string
+}
 
 export default function Graphjson() {
   const [apiKey, setApiKey] = useState<string>("")
+  const [fetchingCollections, setFetchingCollections] = useState(false)
+  const [fetchedCollections, setFetchedCollections] = useState<string[]>([])
   const [collection, setCollection] = useState<string>("")
   const [startDate, setStartDate] = useState<string>("")
   const [endDate, setEndDate] = useState<string>("now")
   const [fetching, setFetching] = useState(false)
   const { runPython } = usePyodide()
+
+  const fetchCollections = async (apiKey: string) => {
+    if (!apiKey) return
+    setFetchingCollections(true)
+    const payload = {
+      api_key: apiKey
+    }
+    const { data: { list } } = await axios.post("https://www.graphjson.com/api/collections", payload)
+    const collections = list as GraphJSONCollection[]
+    const collectionNames = collections.map(c => c.name)
+    setFetchedCollections(collectionNames)
+    setFetchingCollections(false)
+  }
 
   const fetchData = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -29,13 +50,8 @@ export default function Graphjson() {
       order: "Ascending"
     };
 
-    const data: Object[] = await fetch("https://www.graphjson.com/api/visualize/data", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    })
-      .then(response => response.json())
-      .then(response => response.result)
+    const data: Object[] = await axios.post("https://www.graphjson.com/api/visualize/data", payload)
+      .then(response => response.data.result)
       // Flatten the json to top-level, and move timestamp to top-level
       .then(result => result.map(({ json, timestamp }: { json: Object, timestamp: number }) => ({ ...json, timestamp })))
 
@@ -80,21 +96,33 @@ export default function Graphjson() {
               required
             />
           </div>
+          <button
+            type="button"
+            className="mt-2 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+            onClick={() => fetchCollections(apiKey)}
+            disabled={fetchingCollections}
+          >
+            Fetch Collections
+          </button>
         </div>
 
         <div>
           <label htmlFor="collection" className="block text-sm font-medium text-gray-300">
             GraphJSON Collection
           </label>
-          <div className="mt-1">
-            <input
-              type="text"
+          {fetchingCollections ? <Loader /> : (
+            <select
               name="collection"
-              className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
               value={collection}
               onChange={(e) => setCollection(e.target.value)}
-            />
-          </div>
+              disabled={fetchedCollections.length === 0}
+            >
+              {fetchedCollections.map(collectionName => (
+                <option value={collectionName}>{collectionName}</option>
+              ))}
+            </select>
+          )}
         </div>
 
         <div>
