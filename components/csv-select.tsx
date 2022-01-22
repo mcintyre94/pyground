@@ -62,7 +62,7 @@ export default function CsvSelect({ onParsedCsv }: Props) {
       return (
         <div className="flex flex-row gap-2">
           <DownloadIcon className="w-6 h-6 text-green-600" />
-          <p className="text-gray-100">Drop the file to select it</p>
+          <p className="text-gray-100">Drop the file to import it</p>
         </div>
       )
     }
