@@ -16,11 +16,11 @@ export default function Navbar() {
   return (
     <div className="mx-auto px-2 sm:px-6 lg:px-8 rounded-md bg-gray-900 min-w-full">
       <div className="relative flex items-center justify-between h-16">
-        <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
+        <div className="flex-1 flex items-stretch justify-start">
           <div className="flex-shrink-0 flex items-center text-gray-400">
             Import data...
           </div>
-          <div className="hidden sm:block sm:ml-6">
+          <div className="block sm:ml-6">
             <div className="flex space-x-4">
               {navigation.map((item) => (
                 <Link href={item.href} key={item.name}>

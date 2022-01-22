@@ -51,9 +51,10 @@ export default function PythonEditor({ outputType, startCode }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-4 w-full">
+    <div className="flex flex-col gap-4 max-w-full">
       <Editor
         height="50vh"
+        width="37em"
         defaultLanguage="python"
         defaultValue={startCode}
         theme="vs-dark"
