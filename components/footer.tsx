@@ -1,7 +1,7 @@
 export default function Footer() {
   return (
     <footer className="flex items-center justify-center w-full h-24 border-t text-gray-100 m-8">
-      <p>Data Playground. Built by {' '}
+      <p>Built by {' '}
         <a
           href="https://twitter.com/callum_codes"
           className="underline hover:no-underline hover:text-blue-300"
