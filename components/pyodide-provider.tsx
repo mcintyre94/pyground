@@ -56,8 +56,6 @@ export default function PyodideProvider({ children }: PropsWithChildren<{}>) {
     await pythonClient.run({ code: preloadMatplotlibCode(plotElementId) })
   }
 
-
-
   const value: Value = {
     runPython,
     pyodideLoading: loading,

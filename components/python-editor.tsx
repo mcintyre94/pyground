@@ -2,18 +2,20 @@ import Editor, { Monaco } from "@monaco-editor/react";
 import { useRef, useState } from "react";
 import { usePyodide } from "./pyodide-provider";
 import type monaco from 'monaco-editor';
+import PythonOutput from "./python-output";
+import PlotOutput from "./plot-output";
 
 type Props = {
   outputType: "rendered" | "matplotlib"
-  plotElementId?: string
   startCode: string
 }
 
-export default function PythonEditor({ outputType, plotElementId, startCode }: Props) {
+export default function PythonEditor({ outputType, startCode }: Props) {
   const { runPython, pyodideLoading } = usePyodide()
   const [codeRunning, setCodeRunning] = useState(false)
   const [error, setError] = useState<string | undefined>(undefined)
   const [output, setOutput] = useState<string | undefined>(undefined)
+  const [hasCodeRun, setHasCodeRun] = useState<boolean>(false)
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | undefined>(undefined)
 
   const runCode = async () => {
@@ -29,6 +31,7 @@ export default function PythonEditor({ outputType, plotElementId, startCode }: P
         setError(String(error))
       } finally {
         setCodeRunning(false)
+        setHasCodeRun(true)
       }
     }
   }
@@ -39,9 +42,9 @@ export default function PythonEditor({ outputType, plotElementId, startCode }: P
 
   const renderOutput = () => {
     if (outputType === "rendered" && output !== undefined) {
-      return <div className="prose prose-invert prose-table:table-auto prose-th:text-center whitespace-pre-wrap overflow-x-auto" dangerouslySetInnerHTML={{ __html: output }} />
-    } else if (outputType === "matplotlib" && plotElementId !== undefined) {
-      return <div className="invert" id={plotElementId} />
+      return <PythonOutput output={output} />
+    } else if (outputType === "matplotlib") {
+      return <PlotOutput hasCodeRun={hasCodeRun} />
     } else {
       return null
     }
@@ -75,7 +78,6 @@ export default function PythonEditor({ outputType, plotElementId, startCode }: P
       {error ? <div className="text-sm text-red-400 border-red-600">{error}</div> : null}
 
       {renderOutput()}
-
     </div>
   );
 

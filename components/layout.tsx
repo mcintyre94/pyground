@@ -1,13 +1,10 @@
 import { PropsWithChildren } from "react";
 import Footer from "./footer";
 import Navbar from "./navbar";
-import { usePyodide } from "./pyodide-provider";
 import PythonEditor from "./python-editor";
 import { pandasEditorDefault, matplotlibEditorDefault } from "../lib/pythonFragments"
 
 export default function Layout({ children }: PropsWithChildren<{}>) {
-  const { plotElementId } = usePyodide()
-
   return (
     <>
       <div className="max-w-7xl py-8 px-4 mx-auto lg:px-8">
@@ -15,7 +12,7 @@ export default function Layout({ children }: PropsWithChildren<{}>) {
           {/* editors */}
           <div className="flex flex-row gap-8">
             <PythonEditor outputType="rendered" startCode={pandasEditorDefault} />
-            <PythonEditor outputType="matplotlib" plotElementId={plotElementId} startCode={matplotlibEditorDefault} />
+            <PythonEditor outputType="matplotlib" startCode={matplotlibEditorDefault} />
           </div>
 
           {/* navbar */}
