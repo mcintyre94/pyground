@@ -54,7 +54,7 @@ df = pd.DataFrame(data)
 df.describe().to_html()`;
 
 export const matplotlibEditorDefault = `# preloaded:
-# import matplotlib.plt as pyplot
+# import matplotlib.pyplot as plt
 # fig = plt.figure()
 
 x = [1,2,3]

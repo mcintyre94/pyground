@@ -1,27 +1,34 @@
-# Next.js + Tailwind CSS Example
+# Pyground
 
-This example shows how to use [Tailwind CSS](https://tailwindcss.com/) [(v3.0)](https://tailwindcss.com/blog/tailwindcss-v3) with Next.js. It follows the steps outlined in the official [Tailwind docs](https://tailwindcss.com/docs/guides/nextjs).
+Pyground is a Python data playground that runs in your browser using Pyodide.
 
-## Preview
+It allows importing a CSV file into a Python editor where it can be freely manipulated using common libraries. A Python editor that outputs a figure to a canvas is also provided. Dates in the document are converted to native Python DateTime objects so that they can be easily manipulated/plotted.
 
-Preview the example live on [StackBlitz](http://stackblitz.com/):
+The app is entirely static, never stores your data or sends it anywhere and can be self-hosted anywhere.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/vercel/next.js/tree/canary/examples/with-tailwindcss)
+## Demo
 
-## Deploy your own
+![demo](readme-images/pyground-demo.gif)
 
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=next-example):
+A live version is deployed at https://pyground.vercel.app
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/vercel/next.js/tree/canary/examples/with-tailwindcss&project-name=with-tailwindcss&repository-name=with-tailwindcss)
+## Supported import types
 
-## How to use
+- CSV file
+- [GraphJSON](https://www.graphjson.com): any collection, any date range.
 
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init) or [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/) to bootstrap the example:
+## Deploy
 
-```bash
-npx create-next-app --example with-tailwindcss with-tailwindcss-app
-# or
-yarn create next-app --example with-tailwindcss with-tailwindcss-app
-```
+With Vercel: [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fmcintyre94%2Fpyground&project-name=pyground&repo-name=pyground&demo-title=Pyground&demo-description=An%20example%20deployment%20of%20Pyground%20on%20Vercel&demo-url=https%3A%2F%2Fpyground.vercel.app&demo-image=https://i.imgur.com/DQl6WY5.png)
 
-Deploy it to the cloud with [Vercel](https://vercel.com/new?utm_source=github&utm_medium=readme&utm_campaign=next-example) ([Documentation](https://nextjs.org/docs/deployment)).
+Pyground is written in NextJS with all pages able to be rendered as static HTML. See [NextJS docs](https://nextjs.org/docs/deployment) for other deployment options
+
+## Limitations
+
+- Python runs in the browser using [Pyodide](https://pyodide.org) so their limitations apply. See in particular https://pyodide.org/en/stable/usage/wasm-constraints.html
+
+- The matplotlib render doesn't work in Safari, and that editor is therefore hidden. This includes all iOS browsers. See https://github.com/pyodide/pyodide/issues/1921
+
+- Your data is loaded in the browser, so the supported size will depend on your machine. You can almost certainly find a CSV file that's too big!
+
+- Currently only [packages built in Pyodide](https://pyodide.org/en/stable/usage/packages-in-pyodide.html#packages-in-pyodide) are supported, and they're automatically imported when used. There's not yet any support for loading other packages.
