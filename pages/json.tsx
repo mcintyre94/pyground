@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import CsvSelect from "../components/csv-select";
 import DataFormRow from "../components/data-form-row";
+import JsonSelect from "../components/json-select";
 import { usePyodide } from "../components/pyodide-provider";
 import { DateConversion, DateConversionFormat, preprocessData } from "../lib/pythonFragments";
 
@@ -10,7 +10,7 @@ type FieldAndValue = {
   value: string,
 }
 
-export default function Home() {
+export default function Json() {
   const [parsedData, setParsedData] = useState<Object[]>([])
   const [fields, setFields] = useState<FieldAndValue[]>([])
   const [dateConversionFormats, setDateConversionFormats] = useState<{ [field: string]: DateConversionFormat }>({})
@@ -48,8 +48,6 @@ export default function Home() {
     }))
 
     const dataCode = preprocessData(parsedData, dateConversions)
-    console.log({ dataCode })
-
     const promise = runPython(dataCode).then(_output => window.scrollTo(0, 0))
     toast.promise(promise, {
       loading: 'Setting the data...',
@@ -64,9 +62,9 @@ export default function Home() {
 
   return (
     <div className='flex flex-col gap-4 max-w-4xl'>
-      <h1 className="prose prose-invert prose-2xl">Select a CSV file</h1>
+      <h1 className="prose prose-invert prose-2xl">Select a JSON file</h1>
 
-      <CsvSelect onParsedCsv={setParsedData} />
+      <JsonSelect onParsedJson={setParsedData} />
 
       {fields.length > 0 ? (
         <>
@@ -75,7 +73,7 @@ export default function Home() {
           <form className="flex flex-col gap-4" onSubmit={setData}>
             <table className="table-auto">
               <tbody className="p-2">
-                {fields.map(({ field, value }) => <DataFormRow key={field} field={field} firstValue={value} recordUpdate={recordDateConversion} />)}
+                {fields.map(({ field, value }) => <DataFormRow key={field} field={field} firstValue={JSON.stringify(value)} recordUpdate={recordDateConversion} />)}
               </tbody>
             </table>
 

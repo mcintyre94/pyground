@@ -10,6 +10,7 @@ export default function Navbar() {
 
   const navigation = [
     { name: 'CSV', href: '/', current: asPath === '/' },
+    { name: 'JSON', href: '/json', current: asPath === '/json' },
     { name: 'GraphJSON', href: '/graphjson', current: asPath === '/graphjson' },
   ]
 

@@ -43,6 +43,7 @@ import json
 data = json.loads('${JSON.stringify(data)
     .replaceAll("\\n", " ")
     .replaceAll("\\t", " ")
+    .replaceAll('\\"', "")
     .replaceAll("\\", "/")
     .replaceAll("'", "\\'")
   }')
