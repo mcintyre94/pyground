@@ -37,6 +37,7 @@ export default function PyodideProvider({ children }: PropsWithChildren<{}>) {
         indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.18.1/full/',
       });
       await preloadMatplotlib(loadedPyodide);
+      await importDateUtil(loadedPyodide);
       setPyodide(loadedPyodide);
     }
 
@@ -54,6 +55,11 @@ export default function PyodideProvider({ children }: PropsWithChildren<{}>) {
   async function preloadMatplotlib(pyodide: Pyodide) {
     const pythonClient = createPythonClient(pyodide)
     await pythonClient.run({ code: preloadMatplotlibCode(plotElementId) })
+  }
+
+  async function importDateUtil(pyodide: Pyodide) {
+    const pythonClient = createPythonClient(pyodide)
+    await pythonClient.run({ code: 'import dateutil' })
   }
 
   const value: Value = {

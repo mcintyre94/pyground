@@ -24,7 +24,8 @@ const pythonDateConvert = (dateConversion: DateConversion) => {
   if (dateConversion.format === "timestamp_seconds") {
     return `d['${dateConversion.field}'] = datetime.fromtimestamp(int(d['${dateConversion.field}']))`
   } else if (dateConversion.format === "isoformat") {
-    return `d['${dateConversion.field}'] = datetime.fromisoformat(d['${dateConversion.field}'])`
+    // TODO next: change this to dateutil.parser.isoparse - more flexible!
+    return `d['${dateConversion.field}'] = dateutil.parser.isoparse(d['${dateConversion.field}'])`
   } else {
     // assume format is a valid input to strptime
     return `d['${dateConversion.field}'] = datetime.strptime(d['${dateConversion.field}'], '${dateConversion.format}')`

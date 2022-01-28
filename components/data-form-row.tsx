@@ -47,7 +47,7 @@ export default function DataFormRow({ field, firstValue, recordUpdate }: DataFor
         >
           <option value="none">Not a date</option>
           <option value="timestamp_seconds">Timestamp (seconds since UNIX epoch)</option>
-          <option value="isoformat">ISOformat (eg. 2022-01-07T21:47:30) (</option>
+          <option value="isoformat">ISOformat (eg. 2022-01-07T21:47:30)</option>
           <option value="custom_format">Custom format</option>
         </select>
       </td>
