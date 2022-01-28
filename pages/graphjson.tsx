@@ -5,6 +5,13 @@ import toast from "react-hot-toast"
 import axios from "axios"
 import Loader from "../components/loader"
 
+declare global {
+  // <- [reference](https://stackoverflow.com/a/56458070/11542903)
+  interface Window {
+    parsedData: string
+  }
+}
+
 type GraphJSONCollection = {
   name: string
 }
@@ -56,7 +63,8 @@ export default function Graphjson() {
       .then(result => result.map(({ json, timestamp }: { json: Object, timestamp: number }) => ({ ...json, timestamp })))
 
     const dateConversions: DateConversion[] = [{ field: "timestamp", format: "timestamp_seconds" }]
-    const dataCode = preprocessData(data, dateConversions)
+    window.parsedData = JSON.stringify(data)
+    const dataCode = preprocessData(dateConversions)
     console.log({ dataCode })
 
     setFetching(false)

@@ -5,6 +5,13 @@ import JsonSelect from "../components/json-select";
 import { usePyodide } from "../components/pyodide-provider";
 import { DateConversion, DateConversionFormat, preprocessData } from "../lib/pythonFragments";
 
+declare global {
+  // <- [reference](https://stackoverflow.com/a/56458070/11542903)
+  interface Window {
+    parsedData: string
+  }
+}
+
 type FieldAndValue = {
   field: string,
   value: string,
@@ -47,7 +54,9 @@ export default function Json() {
       format,
     }))
 
-    const dataCode = preprocessData(parsedData, dateConversions)
+    window.parsedData = JSON.stringify(parsedData)
+
+    const dataCode = preprocessData(dateConversions)
     const promise = runPython(dataCode).then(_output => window.scrollTo(0, 0))
     toast.promise(promise, {
       loading: 'Setting the data...',

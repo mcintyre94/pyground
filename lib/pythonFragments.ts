@@ -24,7 +24,6 @@ const pythonDateConvert = (dateConversion: DateConversion) => {
   if (dateConversion.format === "timestamp_seconds") {
     return `d['${dateConversion.field}'] = datetime.fromtimestamp(int(d['${dateConversion.field}']))`
   } else if (dateConversion.format === "isoformat") {
-    // TODO next: change this to dateutil.parser.isoparse - more flexible!
     return `d['${dateConversion.field}'] = dateutil.parser.isoparse(d['${dateConversion.field}'])`
   } else {
     // assume format is a valid input to strptime
@@ -37,18 +36,12 @@ for d in data:
 ${dateConversions.map(dc => `    ${pythonDateConvert(dc)}`).join('\n')}
 `
 
-export const preprocessData = (data: Object[], dateConversions: DateConversion[]) => `
+export const preprocessData = (dateConversions: DateConversion[]) => `
 from datetime import datetime
 import json
+import js
 
-data = json.loads('${JSON.stringify(data)
-    .replaceAll("\\n", " ")
-    .replaceAll("\\t", " ")
-    .replaceAll('\\"', "")
-    .replaceAll("\\", "/")
-    .replaceAll("'", "\\'")
-  }')
-` + (dateConversions.length > 0 ? processDateConversions(dateConversions) : '')
+data = json.loads(js.parsedData)` + (dateConversions.length > 0 ? processDateConversions(dateConversions) : '')
 
 export const pandasEditorDefault = `import pandas as pd 
 
