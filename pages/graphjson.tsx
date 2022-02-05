@@ -32,7 +32,7 @@ export default function Graphjson() {
     const payload = {
       api_key: apiKey
     }
-    const { data: { list } } = await axios.post("https://www.graphjson.com/api/collections", payload)
+    const { data: { list } } = await axios.post("https://api.graphjson.com/api/collections", payload)
     const collections = list as GraphJSONCollection[]
     const collectionNames = collections.map(c => c.name)
     setFetchedCollections(collectionNames)
@@ -57,7 +57,7 @@ export default function Graphjson() {
       order: "Ascending"
     };
 
-    const data: Object[] = await axios.post("https://www.graphjson.com/api/visualize/data", payload)
+    const data: Object[] = await axios.post("https://api.graphjson.com/api/visualize/data", payload)
       .then(response => response.data.result)
       // Flatten the json to top-level, and move timestamp to top-level
       .then(result => result.map(({ json, timestamp }: { json: Object, timestamp: number }) => ({ ...json, timestamp })))
