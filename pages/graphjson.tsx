@@ -3,6 +3,7 @@ import { usePyodide } from "../components/pyodide-provider"
 import { DateConversion, preprocessData } from "../lib/pythonFragments"
 import toast from "react-hot-toast"
 import axios from "axios"
+import { DateTime } from "luxon"
 import Loader from "../components/loader"
 
 declare global {
@@ -39,26 +40,63 @@ export default function Graphjson() {
     setFetchingCollections(false)
   }
 
+  type GraphJsonDataObject = {
+    json: Object,
+    timestamp: number,
+  }
+
+  type GraphJsonDataPayload = {
+    result: GraphJsonDataObject[]
+  }
+
+  // Only returns 50 results at a time, so need to keep fetching
+  const fetchFromGraphjson = async () => {
+    // graphjson input, so this is a string not a date object
+    let start: string = startDate
+    let data: GraphJsonDataObject[] = []
+
+    while (true) {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      const payload = {
+        api_key: apiKey,
+        collection: collection,
+        IANA_time_zone: tz,
+        graph_type: "Samples",
+        start: start,
+        end: endDate,
+        filters: [],
+        customizations: {},
+        order: "Ascending"
+      };
+
+      console.log(`Fetching from GraphJSON with start ${start}`)
+
+      const { data: fetchedData }: { data: GraphJsonDataPayload } = await axios.post("https://api.graphjson.com/api/visualize/data", payload)
+      const { result } = fetchedData
+
+      if (result.length === 0) {
+        break
+      }
+
+      // GraphJSON timestamp is in seconds
+      const lastTimestamp = result[result.length - 1].timestamp
+      const lastTimestampDate = DateTime.fromSeconds(lastTimestamp, { zone: tz })
+
+      // GraphJSON format is eg. 05/08/2022 9:10 pm (8th May 2022)
+      // Dedupe on timestamp, add 1 min and fetch from there
+      start = lastTimestampDate.plus({ minutes: 1 }).toFormat("MM/dd/y h:mm a")
+      data = [...data, ...result]
+    }
+
+    return data
+  }
+
   const fetchData = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setFetching(true)
 
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-    const payload = {
-      api_key: apiKey,
-      collection: collection,
-      IANA_time_zone: tz,
-      graph_type: "Samples",
-      start: startDate,
-      end: endDate,
-      filters: [],
-      customizations: {},
-      order: "Ascending"
-    };
-
-    const data: Object[] = await axios.post("https://api.graphjson.com/api/visualize/data", payload)
-      .then(response => response.data.result)
+    const data = await fetchFromGraphjson()
       // Flatten the json to top-level, and move timestamp to top-level
       .then(result => result.map(({ json, timestamp }: { json: Object, timestamp: number }) => ({ ...json, timestamp })))
 
@@ -82,10 +120,10 @@ export default function Graphjson() {
   }
 
   return (
-    <div className='flex flex-col gap-8 max-w-4xl'>
-      <h1 className="prose prose-invert prose-2xl">Fetch data from <a href="https://graphjson.com" className="hover:no-underline">GraphJSON</a></h1>
+    <div className='flex flex-col max-w-4xl gap-8'>
+      <h1 className="prose prose-2xl prose-invert">Fetch data from <a href="https://graphjson.com" className="hover:no-underline">GraphJSON</a></h1>
 
-      <p className="text text-sm text-gray-100">
+      <p className="text-sm text-gray-100 text">
         Your API key is used only to fetch data from GraphJSON. It is never stored or sent anywhere else.
       </p>
 
@@ -108,7 +146,7 @@ export default function Graphjson() {
           </div>
           <button
             type="button"
-            className="mt-2 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+            className="inline-flex items-center px-3 py-2 mt-2 text-sm font-medium leading-4 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
             onClick={() => fetchCollections(apiKey)}
             disabled={fetchingCollections}
           >
@@ -123,7 +161,7 @@ export default function Graphjson() {
           {fetchingCollections ? <Loader /> : (
             <select
               name="collection"
-              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+              className="block w-full py-2 pl-3 pr-10 mt-1 text-base border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               value={collection}
               onChange={(e) => setCollection(e.target.value)}
               disabled={fetchedCollections.length === 0}
@@ -143,7 +181,7 @@ export default function Graphjson() {
             <input
               type="text"
               name="collection"
-              className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+              className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               required
@@ -162,7 +200,7 @@ export default function Graphjson() {
             <input
               type="text"
               name="collection"
-              className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+              className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
               placeholder="3 months ago"
@@ -176,7 +214,7 @@ export default function Graphjson() {
 
         <button
           type="submit"
-          className="bg-blue-500 hover:bg-blue-700 hover:scale-105 text-white font-bold py-2 px-4 rounded w-fit transition transition-200 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-progress"
+          className="px-4 py-2 font-bold text-white transition bg-blue-500 rounded hover:bg-blue-700 hover:scale-105 w-fit transition-200 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-progress"
           disabled={fetching}
         >{fetching ? "Fetching..." : "Fetch Data"}</button>
 
