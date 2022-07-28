@@ -92,11 +92,17 @@ export default function Graphjson() {
     return data
   }
 
+  function getUniqueListBy<T, K extends keyof T>(arr: T[], key: K) {
+    return [...new Map(arr.map(item => [item[key], item])).values()]
+  }
+
   const fetchData = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setFetching(true)
 
     const data = await fetchFromGraphjson()
+      // dedupe by timestamp
+      .then(result => getUniqueListBy(result, "timestamp"))
       // Flatten the json to top-level, and move timestamp to top-level
       .then(result => result.map(({ json, timestamp }: { json: Object, timestamp: number }) => ({ ...json, timestamp })))
 
